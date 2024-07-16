@@ -97,3 +97,47 @@ export const changeStatus = async (req: Request, res: Response) => {
     });
   }
 }
+
+// [PATCH] /api/v1/tasks/change-multi
+export const changeMultip = async (req: Request, res: Response) => {
+  try {
+    const ids: string[] = req.body.id;
+    const key: string = req.body.key;
+    switch (key) {
+      case "status":
+        const value: string = req.body.value;
+        await Task.updateMany({
+          _id: { $in: ids }
+        }, {
+          status: value
+        });
+        res.json({
+          code: 200,
+          message: "Change status success!"
+        });
+        break;
+      case "delete":
+        await Task.updateMany({
+          _id: { $in: ids }
+        }, {
+          deleted: true
+        });
+        res.json({
+          code: 200,
+          message: "Delete Task success!"
+        });
+        break;
+      default:
+        res.json({
+          code: 400,
+          message: "Not exist feature!"
+        });
+        break;
+    }
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "error"
+    });
+  }
+}
