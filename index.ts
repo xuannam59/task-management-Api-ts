@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 
 import * as database from "./config/database.config";
@@ -12,6 +13,9 @@ const port: number = 3000;
 
 // parse application/json
 app.use(bodyParser.json());
+
+//CORS
+app.use(cors());
 
 // connect database
 database.connect();

@@ -101,11 +101,16 @@ export const changeStatus = async (req: Request, res: Response) => {
 // [PATCH] /api/v1/tasks/change-multi
 export const changeMultip = async (req: Request, res: Response) => {
   try {
+    enum Key {
+      STATUS = "status",
+      DELETE = "delete"
+    }
     const ids: string[] = req.body.id;
     const key: string = req.body.key;
+    const value: string = req.body.value;
+
     switch (key) {
-      case "status":
-        const value: string = req.body.value;
+      case Key.STATUS:
         await Task.updateMany({
           _id: { $in: ids }
         }, {
@@ -116,11 +121,12 @@ export const changeMultip = async (req: Request, res: Response) => {
           message: "Change status success!"
         });
         break;
-      case "delete":
+      case Key.DELETE:
         await Task.updateMany({
           _id: { $in: ids }
         }, {
-          deleted: true
+          deleted: true,
+          deletedAt: new Date(),
         });
         res.json({
           code: 200,
@@ -139,5 +145,87 @@ export const changeMultip = async (req: Request, res: Response) => {
       code: 400,
       message: "error"
     });
+  }
+}
+
+// [POST] /aip/v1/tasks/create
+export const create = async (req: Request, res: Response) => {
+  try {
+    const task = new Task(req.body);
+    await task.save();
+    res.json({
+      code: 200,
+      message: "Create success",
+      task: task
+    })
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Error"
+    });
+  }
+}
+
+// [POST] /api/v1/tasks/edit/:id
+export const edit = async (req: Request, res: Response) => {
+  try {
+    const id: string = req.params.id;
+    const task = await Task.updateOne({
+      _id: id
+    }, req.body);
+
+    res.json({
+      code: 200,
+      message: "Edit items success!",
+      task: task
+    })
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Error"
+    })
+  }
+}
+
+// [DELETE] /api/v1/tasks/delete/:id
+export const deleteOne = async (req: Request, res: Response) => {
+  try {
+    const id: string = req.params.id;
+    await Task.updateOne({
+      _id: id
+    }, {
+      deleted: true,
+      deletedAt: new Date()
+    });
+    res.json({
+      code: 200,
+      message: "Delete item success!"
+    });
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "ERROR!"
+    })
+  }
+}
+
+// [PATCH] /api/v1/tasks/undo/:id
+export const undo = async (req: Request, res: Response) => {
+  try {
+    const id: string = req.params.id;
+    await Task.updateOne({
+      _id: id
+    }, {
+      deleted: false
+    });
+    res.json({
+      code: 200,
+      message: "Undo item success!"
+    })
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "Error!"
+    })
   }
 }

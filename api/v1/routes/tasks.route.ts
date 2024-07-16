@@ -12,4 +12,12 @@ router.patch("/change-status/:id", controller.changeStatus);
 
 router.patch("/change-multip", controller.changeMultip);
 
+router.post("/create", controller.create);
+
+router.patch("/edit/:id", controller.edit);
+
+router.delete("/delete/:id", controller.deleteOne);
+
+router.patch("/undo/:id", controller.undo);
+
 export const tasksRoute: Router = router;
