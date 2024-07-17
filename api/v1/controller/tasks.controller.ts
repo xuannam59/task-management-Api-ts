@@ -2,18 +2,31 @@ import { Request, Response } from "express";
 import Task from "../model/task.model";
 import paginationHelper from "../helper/pagination.helper";
 import searchHelper from "../helper/search.help";
+import { time } from "console";
 
 // [GET] /api/v1/tasks/
 export const index = async (req: Request, res: Response) => {
   try {
+    const userId: string = res.locals.user.id;
     interface Find {
       deleted: boolean,
       status?: string,
       title?: string | RegExp,
+      createBy?: string,
+      listUsers?: string
+      $or?: {}[]
     }
 
     const find: Find = {
       deleted: false,
+      $or: [
+        {
+          createBy: userId
+        },
+        {
+          listUsers: userId
+        }
+      ]
     };
 
     // Status
@@ -58,6 +71,7 @@ export const index = async (req: Request, res: Response) => {
     })
   }
 }
+
 // [GET] /api/v1/tasks/detail/:id
 export const detail = async (req: Request, res: Response) => {
   try {
@@ -81,10 +95,18 @@ export const changeStatus = async (req: Request, res: Response) => {
   try {
     const id: string = req.params.id;
     const status: string = req.body.status;
+    const userId: string = res.locals.user.id;
     await Task.updateOne({
       _id: id,
     }, {
-      status: status
+      status: status,
+      $push: {
+        changeAt: {
+          titel: "Change status",
+          time: Date.now(),
+          by: userId
+        }
+      }
     })
     res.json({
       code: 200,
@@ -108,13 +130,21 @@ export const changeMultip = async (req: Request, res: Response) => {
     const ids: string[] = req.body.id;
     const key: string = req.body.key;
     const value: string = req.body.value;
+    const userId: string = res.locals.user.id;
 
     switch (key) {
       case Key.STATUS:
         await Task.updateMany({
           _id: { $in: ids }
         }, {
-          status: value
+          status: value,
+          $push: {
+            changeAt: {
+              titel: "Change status",
+              time: Date.now(),
+              by: userId
+            }
+          }
         });
         res.json({
           code: 200,
@@ -127,6 +157,7 @@ export const changeMultip = async (req: Request, res: Response) => {
         }, {
           deleted: true,
           deletedAt: new Date(),
+          deletedBy: userId
         });
         res.json({
           code: 200,
@@ -151,6 +182,9 @@ export const changeMultip = async (req: Request, res: Response) => {
 // [POST] /aip/v1/tasks/create
 export const create = async (req: Request, res: Response) => {
   try {
+    const userId: string = res.locals.user.id;
+    req.body.createAt = Date.now();
+    req.body.createBy = userId;
     const task = new Task(req.body);
     await task.save();
     res.json({
@@ -170,9 +204,21 @@ export const create = async (req: Request, res: Response) => {
 export const edit = async (req: Request, res: Response) => {
   try {
     const id: string = req.params.id;
-    const task = await Task.updateOne({
+    const userId: string = res.locals.user.id;
+    req.body.$push = {
+      changeAt: {
+        title: "Edit task",
+        time: Date.now(),
+        by: userId
+      }
+    };
+    await Task.updateOne({
       _id: id
     }, req.body);
+
+    const task = await Task.findOne({
+      _id: id
+    });
 
     res.json({
       code: 200,
@@ -190,12 +236,14 @@ export const edit = async (req: Request, res: Response) => {
 // [DELETE] /api/v1/tasks/delete/:id
 export const deleteOne = async (req: Request, res: Response) => {
   try {
+    const userId: string = res.locals.user.id;
     const id: string = req.params.id;
     await Task.updateOne({
       _id: id
     }, {
       deleted: true,
-      deletedAt: new Date()
+      deleteAt: new Date(),
+      deletedBy: userId
     });
     res.json({
       code: 200,

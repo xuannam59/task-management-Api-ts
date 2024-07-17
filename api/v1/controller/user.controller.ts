@@ -155,4 +155,22 @@ export const resetPassword = async (req: Request, res: Response) => {
   }
 }
 
+// [GET] /api/v1/user/detail
+export const detail = async (req: Request, res: Response) => {
+  try {
+    const token: string = req.cookies.token;
+    const user = await User.findOne({
+      token: token,
+    }).select("-password");
+
+    res.json({
+      code: 200,
+      message: "Get user information success!",
+      user: user
+    });
+  } catch (error) {
+    catchError(res);
+  }
+}
+
 
