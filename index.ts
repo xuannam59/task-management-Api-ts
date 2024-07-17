@@ -10,7 +10,7 @@ import routeApiV1 from "./api/v1/routes/index.route";
 
 dotenv.config();
 const app: Express = express();
-const port: number = 3000;
+const port: number | string = process.env.PORT;
 
 //cookie Parser
 app.use(cookieParser());

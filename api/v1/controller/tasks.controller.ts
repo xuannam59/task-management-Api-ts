@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import Task from "../model/task.model";
-import paginationHelper from "../helper/pagination.helper";
-import searchHelper from "../helper/search.help";
-import { time } from "console";
+import paginationHelper from "../../../helper/pagination.helper";
+import searchHelper from "../../../helper/search.help";
 
 // [GET] /api/v1/tasks/
 export const index = async (req: Request, res: Response) => {

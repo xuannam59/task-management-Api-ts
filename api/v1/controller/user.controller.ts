@@ -4,8 +4,8 @@ import md5 from "md5";
 import User from "../model/user.model";
 import Forgot from "../model/forgot-password.model";
 // Helper
-import * as generateHelper from "../helper/generate.helper";
-import sendMailHelper from "../helper/sendMail.helper";
+import * as generateHelper from "../../../helper/generate.helper";
+import sendMailHelper from "../../../helper/sendMail.helper";
 
 const catchError = (res: Response) => {
   res.json({
