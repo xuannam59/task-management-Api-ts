@@ -6,7 +6,7 @@ import * as autheUserMiddleware from "../middleware/auth-user.middleware";
 const routeApiV1 = (app) => {
   const version = "/api/v1";
 
-  app.use(version + "/tasks", autheUserMiddleware.authUser, tasksRoute);
+  app.use(version + "/tasks", autheUserMiddleware.requestAuth, tasksRoute);
 
   app.use(version + "/user", userRouter);
 }

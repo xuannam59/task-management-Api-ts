@@ -9,7 +9,7 @@ const emailFormat = (email: string) => {
 }
 
 // Validate register
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const email: string = req.body.email;
   const user = await User.findOne({
     email: email,
@@ -43,7 +43,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 }
 
 // Validate login
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const email = req.body.email;
   const password = req.body.password;
 
@@ -71,7 +71,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 }
 
 // Validate resetPassword
-export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+export const resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const token: string = req.cookies.token;
   const password: string = req.body.password;
   const confirmPassword: string = req.body.confirmPassword;

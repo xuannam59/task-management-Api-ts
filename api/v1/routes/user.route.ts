@@ -15,6 +15,6 @@ router.post("/password/otp", controller.otpPassword);
 
 router.post("/password/reset", userValidate.resetPassword, controller.resetPassword);
 
-router.get("/detail", autheUserMiddleware.authUser, controller.detail);
+router.get("/detail", autheUserMiddleware.requestAuth, controller.detail);
 
 export const userRouter = router;
