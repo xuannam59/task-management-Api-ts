@@ -8,6 +8,7 @@ const emailFormat = (email: string) => {
   return email.toLowerCase().match(regexEmail);
 }
 
+// Validate register
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   const email: string = req.body.email;
   const user = await User.findOne({
@@ -41,6 +42,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   next();
 }
 
+// Validate login
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -65,5 +67,42 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     return;
   }
 
+  next();
+}
+
+// Validate resetPassword
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  const token: string = req.cookies.token;
+  const password: string = req.body.password;
+  const confirmPassword: string = req.body.confirmPassword;
+
+  const user = await User.findOne({
+    token: token,
+    deleted: false,
+  })
+
+  if (!user) {
+    res.json({
+      code: 400,
+      message: "Error Token code. Please contact with adminstrator"
+    });
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    res.json({
+      code: 400,
+      message: "Confirm Password not equal to password. Please re-enter!"
+    });
+    return;
+  }
+
+  if (md5(password) === user.password) {
+    res.json({
+      code: 400,
+      message: "Password is the same as old password. Please enter new password!"
+    });
+    return;
+  }
   next();
 }
